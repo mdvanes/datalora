@@ -9,6 +9,18 @@
 - Start and stop debugger with F5 / ctrl-C
 - Call the function: in Azure extension > Functions > "my function" > Right-click > Execute function now...
 
+## Publishing
+
+- Sign in: in Azure extension > Sign in to Azure
+- in Azure extension > Deploy to Function App
+- Test from Azure extension, or use curl:
+
+```bash
+curl -X POST https://codestardatalora.azurewebsites.net/api/ReceiveLoraData \
+   -H 'Content-Type: application/json' \
+   -d '{"name":"foo"}'
+```
+
 ## Resources
 
 - https://portal.kpnthings.com/ (Freemium)

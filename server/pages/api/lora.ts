@@ -3,12 +3,44 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { NextResponse } from "next/server";
 
+// [
+//   { bn: 'urn:dev:DEVEUI:111:', bt: 164 },
+//   { n: 'locOrigin', vs: 'KPNLORA' },
+//   { n: 'latitude', u: 'lat', v: 1 },
+//   { n: 'longitude', u: 'lon', v: 1 },
+//   { n: 'radius', u: 'm', v: 1 },
+//   { n: 'locAccuracy', u: '%', v: 9999 },
+//   { n: 'locPrecision', u: '%', v: 9999 },
+//   { n: 'locTime', vs: '16407' }
+// ]
+
+interface Line {
+  n: string;
+  v: number;
+  vs: string;
+}
+
 export default function handler(req: IncomingMessage, res: any) {
-  console.log('1', req.body);
   if(req.method === "POST") {
-    // TODO handle incoming message from kpnthings
-    res.status(200).json({ status: "DONE" });
+    // @ts-expect-error req.body exists
+    const data: Line[] = req.body;
+    // console.log('req.body', data);
+
+    try {
+      const latitude = data.find(item => item.n === "latitude")?.v ?? "";
+      const longitude = data.find(item => item.n === "longitude")?.v ?? "";
+      const locTime = data.find(item => item.n === "locTime")?.vs ?? "";
+  
+      const logtimestamp = (new Date()).toLocaleString("nl-nl");
+      console.log(`${logtimestamp} ${latitude},${longitude} [${locTime} ${(new Date(parseInt(locTime, 10))).toLocaleString("nl-nl")}]`);
+      res.status(200).json({ status: "POST OK" });
+    } catch(err) {
+      console.error(err);
+      res.status(500).json({ status: "POST FAILED" });
+    }
   } else {
-    res.status(200).json({ name: "John Doe" });
+    // @ts-expect-error req.query exists
+    console.log('req.query', req.query);
+    res.status(200).json({ status: "GET OK" });
   }
 }

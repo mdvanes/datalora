@@ -1,7 +1,7 @@
 # Running
 
-- yarn
-- yarn start
+- `yarn`
+- `yarn start`
 - curl:
 
 ```bash

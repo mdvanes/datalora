@@ -38,20 +38,24 @@ export default function handler(req: IncomingMessage, res: any) {
   if (req.method === "POST") {
     // @ts-expect-error req.body exists
     const data: Line[] = req.body;
-    console.log('req.body', data, req.headers.origin);
+    console.log('req.body', data, req.headers, req.headers.origin);
 
     try {
-      const latitude = data.find((item) => item.n === "latitude")?.v ?? "";
-      const longitude = data.find((item) => item.n === "longitude")?.v ?? "";
-      const locTime = data.find((item) => item.n === "locTime")?.vs ?? "";
-
-      const logtimestamp = new Date().toLocaleString("nl-nl");
-      const logMessage = `${logtimestamp} ${latitude},${longitude} [${locTime} ${new Date(
-        parseInt(locTime, 10)
-      ).toLocaleString("nl-nl")}]`;
-      console.log(logMessage);
-      // appendFileSync("log.txt", logMessage);
-      stream.write(`${logMessage}\n`);
+      const temp = data.find((item) => item.n === "temperature")?.v ?? -1;
+      if(temp === -1) {
+        const latitude = data.find((item) => item.n === "latitude")?.v ?? "";
+        const longitude = data.find((item) => item.n === "longitude")?.v ?? "";
+        const locTime = data.find((item) => item.n === "locTime")?.vs ?? "";
+  
+        const logtimestamp = new Date().toLocaleString("nl-nl");
+        const logMessage = `${logtimestamp} ${latitude},${longitude} [${locTime} ${new Date(
+          parseInt(locTime, 10)
+        ).toLocaleString("nl-nl")}]`;
+        console.log(logMessage);
+        stream.write(`${logMessage}\n`);  
+      } else {
+        console.log("temp ignored");
+      }
       res.status(200).json({ status: "POST OK" });
     } catch (err) {
       console.error(err);

@@ -1,4 +1,4 @@
-import { LatLngTuple } from "leaflet";
+import { LatLngTuple, polygon } from "leaflet";
 import { FC, useEffect, useState } from "react";
 import {
   MapContainer,
@@ -24,6 +24,13 @@ const getCoords = async () => {
 
 const DEFAULT_CENTER: LatLngTuple = [52, 5.1];
 
+const TILES_LAYER_DEFAULT =
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+const TILES_LAYER_BW = "https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png";
+// Source: https://leaflet-extras.github.io/leaflet-providers/preview/
+const TILES_LAYER_DARK =
+  "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+
 const MapContent: FC = () => {
   const [coords, setCoords] = useState<Item[]>([]);
   //   const [center, setCenter] = useState<LatLngTuple>(DEFAULT_CENTER);
@@ -31,13 +38,16 @@ const MapContent: FC = () => {
 
   useEffect(() => {
     getCoords().then((result) => {
+    //   result.push({ loc: [51, 1], time: "" }); // for debugging fitBounds
       setCoords(result);
-      //   if (result.length > 0) {
-      //     setCenter(result[0].loc);
-      console.log(result[0].loc);
-      //   }
-      //   map.setView(center, 20);
-      map.setView(result[0].loc);
+      if (result.length > 0) {
+        // console.log(result[0].loc);
+        // map.setView(DEFAULT_CENTER, 15);
+        // map.flyTo(result[0].loc, 20);
+        // map.setView(result[0].loc, 20);
+        const newPoly = polygon(result.map(({ loc }) => loc));
+        map.fitBounds(newPoly.getBounds());
+      }
     });
   }, []);
 
@@ -45,8 +55,7 @@ const MapContent: FC = () => {
     <>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        // url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        url="https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png"
+        url={TILES_LAYER_DARK}
       />
       <Polyline positions={coords.map((coord) => coord.loc)} />
     </>

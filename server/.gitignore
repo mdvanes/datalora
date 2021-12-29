@@ -1,0 +1,4 @@
+node_modules
+
+# do not ignore?
+.next 

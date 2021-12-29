@@ -2,3 +2,6 @@ node_modules
 
 # do not ignore?
 .next 
+
+NOTES.md
+log.txt

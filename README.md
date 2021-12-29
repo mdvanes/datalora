@@ -7,7 +7,7 @@
 
 Diagram
 
-![diagram](DataLora.drawio.svg)
+![diagram](/DataLoRa.drawio.svg)
 
 ## Running
 

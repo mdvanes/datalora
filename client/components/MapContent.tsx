@@ -37,7 +37,7 @@ const MapContent: FC = () => {
   const [marker, setMarker] = useState<Item | null>(null);
   const map = useMap();
 
-  useEffect(() => {
+  const update = () => {
     getCoords().then((result) => {
       //   result.push({ loc: [51, 1], time: "" }); // for debugging fitBounds
       setCoords(result);
@@ -52,10 +52,15 @@ const MapContent: FC = () => {
         setMarker(last);
       }
     });
+  };
+
+  useEffect(() => {
+    update();
   }, []);
 
   return (
     <>
+      {/* TODO <button>update</button> */}
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url={TILES_LAYER_DARK}
@@ -63,9 +68,7 @@ const MapContent: FC = () => {
       <Polyline positions={coords.map((coord) => coord.loc)} />
       {marker && (
         <Marker position={marker.loc}>
-          <Popup>
-            {marker.time}
-          </Popup>
+          <Popup>{marker.time}</Popup>
         </Marker>
       )}
     </>

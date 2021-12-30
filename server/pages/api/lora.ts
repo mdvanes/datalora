@@ -33,7 +33,7 @@ interface Line {
   vs: string;
 }
 
-const stream = createWriteStream("log.txt", { flags: "a" });
+// const stream = createWriteStream("log.txt", { flags: "a" });
 
 const url = process.env.INFLUX_URL!;
 const token = process.env.INFLUX_TOKEN!;
@@ -48,7 +48,7 @@ export default function handler(req: IncomingMessage, res: any) {
   if (req.method === "POST") {
     // @ts-expect-error req.body exists
     const data: Line[] = req.body;
-    console.log("req.body", data, req.headers, req.headers.origin);
+    // console.log("req.body", data, req.headers, req.headers.origin);
 
     try {
       const temp = data.find((item) => item.n === "temperature")?.v ?? -1;
@@ -61,14 +61,18 @@ export default function handler(req: IncomingMessage, res: any) {
         const logMessage = `${logtimestamp} ${latitude},${longitude} [${locTime} ${new Date(
           parseInt(locTime, 10)
         ).toLocaleString("nl-nl")}]`;
-        console.log(logMessage);
-        stream.write(`${logMessage}\n`);
+        // console.log(logMessage);
+        // stream.write(`${logMessage}\n`);
 
         const point1 = new Point("location")
           .tag("sensor_id", "towel")
           // TODO definitely the wrong way to store latitude and longitude
           .stringField("latlng", `[${latitude},${longitude}]`);
-        console.log(` ${point1}`);
+        console.log(
+          `point1= ${point1} (time ${new Date(
+            parseInt(locTime, 10)
+          ).toLocaleString("nl-nl")})`
+        );
         writeApi.writePoint(point1);
         // TODO close on server close?
         // writeApi.close().then(() => {

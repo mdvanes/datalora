@@ -21,6 +21,7 @@ const org = process.env.INFLUX_ORG!;
 
 const queryApi = new InfluxDB({ url, token }).getQueryApi(org);
 
+// TODO specify only last 24 hours
 const fluxQuery =
   'from(bucket:"iot") |> range(start: 0) |> filter(fn: (r) => r._measurement == "location")';
 

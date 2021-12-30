@@ -15,15 +15,14 @@ interface Item {
   time: string;
 }
 
-const url = "http://localhost:8086"; // process.env.INFLUX_URL;
-const token =
-  "ZiDWhwF4uG_wZ2b_QhdKT-Jv_MUINv-ML5d_UTcxtL8ST4BXV9hquf7moTAFMSPzJVeFcjGZ_kyRI_pd7SzBNw=="; // process.env.INFLUX_TOKEN;
-const org = "bank"; // process.env.INFLUX_ORG;
+const url = process.env.INFLUX_URL!;
+const token = process.env.INFLUX_TOKEN!;
+const org = process.env.INFLUX_ORG!;
 
 const queryApi = new InfluxDB({ url, token }).getQueryApi(org);
 
 const fluxQuery =
-  'from(bucket:"bonk") |> range(start: 0) |> filter(fn: (r) => r._measurement == "location")';
+  'from(bucket:"iot") |> range(start: 0) |> filter(fn: (r) => r._measurement == "location")';
 
 // const result: Item[] = [];
 
@@ -117,17 +116,17 @@ export default async function handler(req: IncomingMessage, res: any) {
     res.status(200).json({ status: "POST OK" });
   } else {
     // const result = readFileSync("./log.txt", "utf8");
-    const result = readFileSync("../server/log.txt", "utf8");
+    // const result = readFileSync("../server/log.txt", "utf8");
     // console.log(result);
 
-    const lines = result.split("\n");
+    // const lines = result.split("\n");
     // const coords = lines.map<Item | null>(parseLogLine).filter(isNotNull);
     // console.log(coords);
 
     // queryApi.queryRows(fluxQuery, fluxObserver(res));
     const rows = await queryApi.collectRows(fluxQuery, rowMapper);
     const coords = rows.filter(isNotNull);
-    console.log("rows", coords);
+    // console.log("rows", coords);
 
     res.status(200).json({ status: "GET OK", data: coords });
   }

@@ -35,11 +35,10 @@ interface Line {
 
 const stream = createWriteStream("log.txt", { flags: "a" });
 
-const url = "http://localhost:8086"; // process.env.INFLUX_URL;
-const token =
-  "ZiDWhwF4uG_wZ2b_QhdKT-Jv_MUINv-ML5d_UTcxtL8ST4BXV9hquf7moTAFMSPzJVeFcjGZ_kyRI_pd7SzBNw=="; // process.env.INFLUX_TOKEN;
-const org = "bank"; // process.env.INFLUX_ORG;
-const bucket = "bonk"; // process.env.INFLUX_BUCKET;
+const url = process.env.INFLUX_URL!;
+const token = process.env.INFLUX_TOKEN!;
+const org = process.env.INFLUX_ORG!;
+const bucket = process.env.INFLUX_BUCKET!;
 
 const influxDB = new InfluxDB({ url, token });
 const writeApi = influxDB.getWriteApi(org, bucket);

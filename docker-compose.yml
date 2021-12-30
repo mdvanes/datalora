@@ -8,8 +8,14 @@ services:
       - INFLUX_URL=http://192.168.0.17:8087
     depends_on:
       - db
-  # server:
-  #   build: ./server
+  server:
+    build: ./server
+    ports:
+      - "3033:3031"
+    environment:
+      - INFLUX_URL=http://192.168.0.17:8087
+    depends_on:
+      - db
   db:
     image: influxdb:2.0-alpine
     ports:

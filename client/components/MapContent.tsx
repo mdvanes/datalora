@@ -68,7 +68,7 @@ const MapContent: FC = () => {
       <Polyline positions={coords.map((coord) => coord.loc)} />
       {marker && (
         <Marker position={marker.loc}>
-          <Popup>{marker.time}</Popup>
+          <Popup>{(new Date(marker.time)).toLocaleString("nl-nl")}</Popup>
         </Marker>
       )}
     </>

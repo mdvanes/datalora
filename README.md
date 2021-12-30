@@ -17,6 +17,7 @@ Diagram
 
 ## Publishing
 
+- `mkdir influx-data`
 - Configure envars in docker-compose.yml
 - Run `docker-compose up`
 - It might be that there was no configuration for InfluxDB, either log in at localhost:8086 to set it up, or copy an existing configuration to the influx directory.

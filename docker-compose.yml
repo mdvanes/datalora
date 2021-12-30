@@ -5,11 +5,14 @@ services:
     ports:
       - "3034:3032" # outer:inner
     environment:
-      - INFLUX_URL=http://192.168.0.17:8086
+      - INFLUX_URL=http://192.168.0.17:8087
+    depends_on:
+      - db
   # server:
   #   build: ./server
-  # db:
-  #   image: influxdb:2.0-alpine
-# docker run --rm --name loradatainflux -p 8086:8086 \
-      # -v $PWD/influx:/var/lib/influxdb2 \
-      # influxdb:2.0-alpine        
+  db:
+    image: influxdb:2.0-alpine
+    ports:
+      - "8087:8086"
+    volumes:
+      - "./influx-data:/var/lib/influxdb2"

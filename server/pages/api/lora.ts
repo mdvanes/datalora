@@ -1,8 +1,9 @@
-// TODO this just works by navigating to localhost:3000/api/lora
+// NOTE this just works by navigating to localhost:3000/api/lora
 
 import { IncomingMessage, ServerResponse } from "http";
 import { NextResponse } from "next/server";
 import { appendFileSync, createWriteStream } from "fs";
+import { InfluxDB, Point } from "@influxdata/influxdb-client";
 
 // [
 //   { bn: 'urn:dev:DEVEUI:111:', bt: 164 },
@@ -32,27 +33,48 @@ interface Line {
   vs: string;
 }
 
-const stream = createWriteStream("log.txt", {flags:'a'});
+const stream = createWriteStream("log.txt", { flags: "a" });
+
+const url = "http://localhost:8086"; // process.env.INFLUX_URL;
+const token =
+  "ZiDWhwF4uG_wZ2b_QhdKT-Jv_MUINv-ML5d_UTcxtL8ST4BXV9hquf7moTAFMSPzJVeFcjGZ_kyRI_pd7SzBNw=="; // process.env.INFLUX_TOKEN;
+const org = "bank"; // process.env.INFLUX_ORG;
+const bucket = "bonk"; // process.env.INFLUX_BUCKET;
+
+const influxDB = new InfluxDB({ url, token });
+const writeApi = influxDB.getWriteApi(org, bucket);
+writeApi.useDefaultTags({ region: "west" });
 
 export default function handler(req: IncomingMessage, res: any) {
   if (req.method === "POST") {
     // @ts-expect-error req.body exists
     const data: Line[] = req.body;
-    console.log('req.body', data, req.headers, req.headers.origin);
+    console.log("req.body", data, req.headers, req.headers.origin);
 
     try {
       const temp = data.find((item) => item.n === "temperature")?.v ?? -1;
-      if(temp === -1) {
+      if (temp === -1) {
         const latitude = data.find((item) => item.n === "latitude")?.v ?? "";
         const longitude = data.find((item) => item.n === "longitude")?.v ?? "";
         const locTime = data.find((item) => item.n === "locTime")?.vs ?? "";
-  
+
         const logtimestamp = new Date().toLocaleString("nl-nl");
         const logMessage = `${logtimestamp} ${latitude},${longitude} [${locTime} ${new Date(
           parseInt(locTime, 10)
         ).toLocaleString("nl-nl")}]`;
         console.log(logMessage);
-        stream.write(`${logMessage}\n`);  
+        stream.write(`${logMessage}\n`);
+
+        const point1 = new Point("location")
+          .tag("sensor_id", "towel")
+          // TODO definitely the wrong way to store latitude and longitude
+          .stringField("latlng", `[${latitude},${longitude}]`);
+        console.log(` ${point1}`);
+        writeApi.writePoint(point1);
+        // TODO close on server close?
+        // writeApi.close().then(() => {
+        //   console.log("WRITE FINISHED");
+        // });
       } else {
         console.log("temp ignored");
       }
@@ -64,6 +86,7 @@ export default function handler(req: IncomingMessage, res: any) {
   } else {
     // @ts-expect-error req.query exists
     console.log("req.query", req.query);
+
     res.status(200).json({ status: "GET OK" });
   }
 }

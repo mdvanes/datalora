@@ -1,4 +1,5 @@
 import { LatLngTuple } from "leaflet";
+import Head from "next/head";
 import { FC } from "react";
 import {
   MapContainer,
@@ -13,6 +14,9 @@ import MapContent from "./MapContent";
 const Map: FC = () => {
   return (
     <div>
+      <Head>
+        <title>DataLora Map</title>
+      </Head>
       <MapContainer
         // center={DEFAULT_CENTER}
         zoom={20}

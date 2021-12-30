@@ -34,11 +34,12 @@ const TILES_LAYER_DARK =
 const MapContent: FC = () => {
   const [coords, setCoords] = useState<Item[]>([]);
   //   const [center, setCenter] = useState<LatLngTuple>(DEFAULT_CENTER);
+  const [marker, setMarker] = useState<Item | null>(null);
   const map = useMap();
 
   useEffect(() => {
     getCoords().then((result) => {
-    //   result.push({ loc: [51, 1], time: "" }); // for debugging fitBounds
+      //   result.push({ loc: [51, 1], time: "" }); // for debugging fitBounds
       setCoords(result);
       if (result.length > 0) {
         // console.log(result[0].loc);
@@ -47,6 +48,8 @@ const MapContent: FC = () => {
         // map.setView(result[0].loc, 20);
         const newPoly = polygon(result.map(({ loc }) => loc));
         map.fitBounds(newPoly.getBounds());
+        const last = result[result.length - 1];
+        setMarker(last);
       }
     });
   }, []);
@@ -58,6 +61,13 @@ const MapContent: FC = () => {
         url={TILES_LAYER_DARK}
       />
       <Polyline positions={coords.map((coord) => coord.loc)} />
+      {marker && (
+        <Marker position={marker.loc}>
+          <Popup>
+            {marker.time}
+          </Popup>
+        </Marker>
+      )}
     </>
   );
 };

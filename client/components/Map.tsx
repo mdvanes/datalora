@@ -24,11 +24,11 @@ const Map: FC = () => {
         <MapContent coords={coords} />
       </MapContainer>
       <div className="custom-controls">
-        <button onClick={update} disabled={isLoading}>
+        <button onClick={() => update(queryType)} disabled={isLoading}>
           update
         </button>
         <button onClick={toggleQueryType} disabled={isLoading}>
-          {queryType === "all" ? "24h" : "all"}
+          {queryType}
         </button>
       </div>
     </div>

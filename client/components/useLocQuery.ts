@@ -1,10 +1,10 @@
-import { FC, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Item } from "./types";
 
 const UPDATE_INTERVAL = 1000 * 60 * 60; // 1000 ms / 60 seconds / 60 minutes = 1x per hour
 
-const getCoords = async () => {
-  const result = await fetch("/api/coords");
+const getCoords = async (type: string) => {
+  const result = await fetch(`/api/coords?type=${type}`);
   const json: { data: Item[] } = await result.json();
   //   console.log(json);
   return json.data;
@@ -15,10 +15,10 @@ export const useLocQuery = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [queryType, setQueryType] = useState<"24h" | "all">("24h");
 
-  const update = async () => {
+  const update = async (type: string): Promise<void> => {
     setIsLoading(true);
     try {
-      const result = await getCoords();
+      const result = await getCoords(type);
       if (result.length > 0) {
         setCoords(result);
       }
@@ -29,14 +29,16 @@ export const useLocQuery = () => {
   };
 
   const toggleQueryType = () => {
-    setQueryType(queryType === "all" ? "24h" : "all");
+    const newType = queryType === "all" ? "24h" : "all";
+    setQueryType(newType);
+    update(newType);
   };
 
   useEffect(() => {
-    update();
+    update(queryType);
     // Auto-update
     const interval = setInterval(() => {
-      update();
+      update(queryType);
     }, UPDATE_INTERVAL);
     return () => clearInterval(interval);
   }, []);

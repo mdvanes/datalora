@@ -9,11 +9,6 @@ WORKDIR /home/node/code
 
 COPY --chown=node:node . .
 
-RUN pwd
-RUN ls -lah
-RUN mkdir -p /home/node/code/node_modules
-RUN ls -lah
 RUN yarn install
-
 
 CMD ["yarn", "start"]

@@ -15,9 +15,11 @@ Screenshot
 
 ![screenshot](/screenshot.png)
 
-## Running
+## Running for development
 
-- run /server (see server/README.md)
+- run InfluxDB (use docker-compose as an example)
+- start receiver (see server/README.md)
+- start client (see client/README.md)
 
 ## Publishing
 

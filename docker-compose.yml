@@ -8,6 +8,7 @@ services:
       - INFLUX_URL=http://192.168.0.17:8087
     depends_on:
       - db
+    restart: unless-stopped
   server:
     build: ./server
     ports:
@@ -16,9 +17,11 @@ services:
       - INFLUX_URL=http://192.168.0.17:8087
     depends_on:
       - db
+    restart: unless-stopped
   db:
     image: influxdb:2.0-alpine
     ports:
       - "8087:8086"
     volumes:
       - "./influx-data:/var/lib/influxdb2"
+    restart: unless-stopped

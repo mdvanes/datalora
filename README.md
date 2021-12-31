@@ -11,6 +11,10 @@ Diagram
 
 ![diagram](/DataLoRa.drawio.svg)
 
+Screenshot
+
+![screenshot](/screenshot.png)
+
 ## Running
 
 - run /server (see server/README.md)

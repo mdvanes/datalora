@@ -6,6 +6,8 @@ import {
 import MapContent from "./MapContent";
 import { Item } from "./types";
 
+const UPDATE_INTERVAL = 1000 * 60 * 60; // 1000 ms / 60 seconds / 60 minutes = 1x per hour
+
 const getCoords = async () => {
   const result = await fetch("/api/coords");
   const json: { data: Item[] } = await result.json();
@@ -15,16 +17,33 @@ const getCoords = async () => {
 
 const Map: FC = () => {
   const [coords, setCoords] = useState<Item[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [queryType, setQueryType] = useState<"24h" | "all">("24h");
 
   const update = async () => {
-    const result = await getCoords();
-    if(result.length > 0) {
-      setCoords(result);
+    setIsLoading(true);
+    try {
+      const result = await getCoords();
+      if(result.length > 0) {
+        setCoords(result);
+      }  
+    } catch(err) {
+      console.error(err);
     }
+    setIsLoading(false);
+  }
+
+  const toggleQueryType = () => {
+    setQueryType(queryType === "all" ? "24h" : "all");
   }
 
   useEffect(() => {
     update();
+    // Auto-update
+    const interval = setInterval(() => {
+      update();
+    }, UPDATE_INTERVAL);
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -44,8 +63,8 @@ const Map: FC = () => {
         <MapContent coords={coords} />
       </MapContainer>
       <div className="custom-controls">
-        <button onClick={update}>update</button>
-        <button>all</button>
+        <button onClick={update} disabled={isLoading}>update</button>
+        <button onClick={toggleQueryType} disabled={isLoading}>{queryType === "all" ? "24h" : "all"}</button>
       </div>
     </div>
   );

@@ -19,7 +19,8 @@ Diagram
 
 - `mkdir influx-data`
 - Configure envars in docker-compose.yml
-- Run `docker-compose up`
+- Run `docker-compose up -d --build`
+- Inspect logs `docker-compose logs`
 - It might be that there was no configuration for InfluxDB, either log in at localhost:8086 to set it up, or copy an existing configuration to the influx directory.
 
 ## Resources

@@ -1,14 +1,11 @@
 // NOTE this just works by navigating to localhost:3000/api/coords
 
-import { IncomingMessage, ServerResponse } from "http";
-import { NextResponse } from "next/server";
-import { readFileSync } from "fs";
+import { IncomingMessage } from "http";
 import {
-  FluxResultObserver,
   FluxTableMetaData,
   InfluxDB,
-  Point,
 } from "@influxdata/influxdb-client";
+import { QueryType } from "components/types";
 
 interface Item {
   loc: [number, number];
@@ -21,9 +18,10 @@ const org = process.env.INFLUX_ORG!;
 
 const queryApi = new InfluxDB({ url, token }).getQueryApi(org);
 
-// TODO specify only last 24 hours
-const fluxQuery =
-  'from(bucket:"iot") |> range(start: 0) |> filter(fn: (r) => r._measurement == "location")';
+const createFluxQuery = (queryType: QueryType): string =>
+  `from(bucket:"iot") 
+  |> range(start: ${queryType === "24h" ? "-24h" : "0"}) 
+  |> filter(fn: (r) => r._measurement == "location")`;
 
 const rowMapper = (
   row: string[],
@@ -47,18 +45,26 @@ const rowMapper = (
   return null;
 };
 
-
 const isNotNull = <T>(item: T | null): item is T => {
   return item !== null;
+};
+
+const getQueryType = (req: IncomingMessage): QueryType => {
+  // @ts-expect-error req.query exists
+  const t: string = req.query?.type ?? "24h";
+  const isValid = t === "all" || t === "24h";
+  return isValid ? t : "24h";
 };
 
 export default async function handler(req: IncomingMessage, res: any) {
   if (req.method !== "GET") {
     res.status(405).json({ status: "ONLY GET IS ALLOWED" });
   } else {
-    // @ts-expect-error
-    console.log(req.query);
-    const rows = await queryApi.collectRows(fluxQuery, rowMapper);
+    const queryType: QueryType = getQueryType(req);
+    const rows = await queryApi.collectRows(
+      createFluxQuery(queryType),
+      rowMapper
+    );
     const coords = rows.filter(isNotNull);
     // console.log("rows", coords);
 

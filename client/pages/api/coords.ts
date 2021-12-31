@@ -25,40 +25,6 @@ const queryApi = new InfluxDB({ url, token }).getQueryApi(org);
 const fluxQuery =
   'from(bucket:"iot") |> range(start: 0) |> filter(fn: (r) => r._measurement == "location")';
 
-// const result: Item[] = [];
-
-// const fluxObserver = (res: any): FluxResultObserver<string[]> => ({
-//   next(row, tableMeta) {
-//     const o = tableMeta.toObject(row);
-//     // console.log(row);
-//     // console.log(
-//     //   `${o._time} ${o._measurement} in ${o.region} (${o.sensor_id}): ${o._field}=${o._value}`
-//     // );
-//     if (typeof o._value === "string") {
-//       // console.log(o._value);
-//       const [latStr, lonStr] = o._value
-//         .slice(1, o._value.length - 1)
-//         .split(",");
-//       const lat = parseFloat(latStr);
-//       const lon = parseFloat(lonStr);
-//       if (!isNaN(lat) && !isNaN(lon)) {
-//         const loc: [number, number] = [lat, lon];
-//         // TODO this is horribly not reactive
-//         result.push({ loc, time: o._time });
-//       }
-//     }
-//   },
-//   error(error) {
-//     console.error(error);
-//     console.log("\nFinished ERROR");
-//   },
-//   complete() {
-//     console.log(result);
-//     console.log("\nFinished SUCCESS");
-//     res.status(200).json({ status: "GET OK", data: result });
-//   },
-// });
-
 const rowMapper = (
   row: string[],
   tableMeta: FluxTableMetaData
@@ -75,56 +41,23 @@ const rowMapper = (
     const lon = parseFloat(lonStr);
     if (!isNaN(lat) && !isNaN(lon)) {
       const loc: [number, number] = [lat, lon];
-      // TODO this is horribly not reactive
-      // result.push({ loc, time: o._time });
       return { loc, time: o._time };
     }
   }
   return null;
 };
 
-// const parseLogLine = (line: string): Item | null => {
-//   // console.log(line);
-//   const [date, time, coordsStr] = line.split(" ");
-
-//   if (coordsStr) {
-//     const [latStr, lonStr] = coordsStr.split(",");
-//     const lat = parseFloat(latStr);
-//     const lon = parseFloat(lonStr);
-//     if (isNaN(lat) || isNaN(lon)) {
-//       return null;
-//     }
-//     try {
-//       const loc: [number, number] = [lat, lon];
-//       return {
-//         loc,
-//         time: `${date} ${time}`,
-//       };
-//     } catch (err) {
-//       return null;
-//     }
-//   } else {
-//     return null;
-//   }
-// };
 
 const isNotNull = <T>(item: T | null): item is T => {
   return item !== null;
 };
 
 export default async function handler(req: IncomingMessage, res: any) {
-  if (req.method === "POST") {
-    res.status(200).json({ status: "POST OK" });
+  if (req.method !== "GET") {
+    res.status(405).json({ status: "ONLY GET IS ALLOWED" });
   } else {
-    // const result = readFileSync("./log.txt", "utf8");
-    // const result = readFileSync("../server/log.txt", "utf8");
-    // console.log(result);
-
-    // const lines = result.split("\n");
-    // const coords = lines.map<Item | null>(parseLogLine).filter(isNotNull);
-    // console.log(coords);
-
-    // queryApi.queryRows(fluxQuery, fluxObserver(res));
+    // @ts-expect-error
+    console.log(req.query);
     const rows = await queryApi.collectRows(fluxQuery, rowMapper);
     const coords = rows.filter(isNotNull);
     // console.log("rows", coords);

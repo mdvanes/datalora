@@ -27,30 +27,12 @@ export default function Home() {
   return (
     <>
     <Head>
-      {/* <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-   crossorigin=""/> */}
         <link
           href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
           rel="stylesheet"
         />
       </Head>
       <DynamicMapWithNoSSR />
-      {/* <Suspense fallback={`loading`}>
-        <DynamicLazyComponent />
-      </Suspense> */}
-      <ul>
-        <li>
-          <Link href="/a" as="/a">
-            <a>a</a>
-          </Link>
-        </li>
-        <li>
-          <Link href="/b" as="/b">
-            <a>b</a>
-          </Link>
-        </li>
-      </ul>
     </>
   );
 }

@@ -22,6 +22,7 @@ FROM node:16-alpine
 WORKDIR /app
 
 COPY --from=build-env /home/node/code/package.json ./package.json
+COPY --from=build-env /home/node/code/.env.local ./.env.local
 COPY --from=build-env /home/node/code/node_modules ./node_modules
 COPY --from=build-env /home/node/code/.next ./.next
 
